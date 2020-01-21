@@ -2,34 +2,35 @@ let request = new XMLHttpRequest();
 let breeds;
 let breed = "";
 let selectedSubbreed = "";
-window.onload=getAllDogs();
+ window.onload=getAllDogs;
 
+Quester.get("https://dog.ceo/api/breeds/list", () => {
+    console.log(Quester._requestObject.response);
+});
 function getAllDogs () {
     let target = "https://dog.ceo/api/breeds/list";
-    request.open('GET', target, true);
-    request.onload = function () {
-        let data = JSON.parse(this.response);
+    Quester.get(target, () => {
+        let data = JSON.parse(Quester._requestObject.response);
         breeds = data[Object.keys(data)[0]];
-    };
-    request.send();
+    });
 }
+
 function f(value) {
     breed = value;
     selectedSubbreed = "";
     let text = "";
     let target = "https://dog.ceo/api/breed/"+ value +"/list";
 
-    request.open('GET', target, true);
-    request.onload = function () {
-        let data = JSON.parse(this.response);
+    Quester.get(target, () => {
+        let data = JSON.parse(Quester._requestObject.response);
         let subbreeds = data[Object.keys(data)[0]];
-            for (let subbreed of subbreeds) {
-                text += "<input type='radio' onclick=\"test('"+ subbreed+"')\" name='subbreed' value='" + subbreed + "'> " + subbreed + "  <br>";
-            }
-            document.getElementById("subbreeds").innerHTML = text;
-        };
-    request.send();
+        for (let subbreed of subbreeds) {
+            text += "<input type='radio' onclick=\"test('"+ subbreed+"')\" name='subbreed' value='" + subbreed + "'> " + subbreed + "  <br>";
+        }
+        document.getElementById("subbreeds").innerHTML = text;
+    });
 }
+
 function test(vale) {
         console.log(vale);
         selectedSubbreed = vale;
@@ -53,14 +54,11 @@ function getRndDog() {
         }
     }
     else target = "https://dog.ceo/api/breeds/image/random";
-    request.open('GET', target, true);
-    request.onload = function () {
-        let data = JSON.parse(this.response);
+    Quester.get(target, () => {
+        let data = JSON.parse(Quester._requestObject.response);
         let link = data[Object.keys(data)[0]];
         let imgSource= "<img srcset='" + link +  " 500w, "+ link +" 800w, "+ link +"' sizes='(max-width:500px, max-height:500px)80vw,(max-width:350px, max-height:500px)10vw,1000px' src= " + link + " class='mx-auto rounded img-thumbnail img-fluid' alt='...' >";
-
         document.getElementById("dogframe").innerHTML = imgSource
-    };
-    request.send();
+    });
 }
 
