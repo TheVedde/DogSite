@@ -1,50 +1,49 @@
 let request = new XMLHttpRequest();
 let breeds;
 let breed = "";
-let selectedSubbreed = "";
+let selectedSubbreed;
  window.onload=getAllDogs;
 
-Quester.get("https://dog.ceo/api/breeds/list", () => {
-    console.log(Quester._requestObject.response);
-});
+// Gets all the dogs into an array and fetches it when the window loads.
 function getAllDogs () {
     let target = "https://dog.ceo/api/breeds/list";
     Quester.get(target, () => {
-        let data = JSON.parse(Quester._requestObject.response);
-        breeds = data[Object.keys(data)[0]];
+        breeds = JSON.parse(Quester._requestObject.response).message;
     });
 }
-
-function f(value) {
+//resets value to use and fetches all subbreed given in a breed
+function subbreedPicker(value) {
     breed = value;
     selectedSubbreed = "";
     let text = "";
     let target = "https://dog.ceo/api/breed/"+ value +"/list";
-
     Quester.get(target, () => {
-        let data = JSON.parse(Quester._requestObject.response);
-        let subbreeds = data[Object.keys(data)[0]];
+        let subbreeds = JSON.parse(Quester._requestObject.response).message;
         for (let subbreed of subbreeds) {
-            text += "<input type='radio' onclick=\"test('"+ subbreed+"')\" name='subbreed' value='" + subbreed + "'> " + subbreed + "  <br>";
+            if (subbreeds.length === 1) {
+                text = "";
+            }
+            else text += "<input type='radio' onclick=\"subbreedAssigner('"+ subbreed+"')\" name='subbreed' value='" + subbreed + "'> " + subbreed + "  <br>";
         }
         document.getElementById("subbreeds").innerHTML = text;
     });
 }
-
-function test(vale) {
-        console.log(vale);
-        selectedSubbreed = vale;
+//sets the selected sub breed value.
+function subbreedAssigner(subbreed) {
+    selectedSubbreed = subbreed;
 }
-function populate() {
+//populates the advanced seach list by inserting the breed names into the list.
+function listPopulate() {
     document.getElementById("subbreeds").innerHTML = "";
     breed = "";
     let text = "";
    for(let breed of breeds) {
-       text += "<option onclick= \"f('" + breed + "')\"   value=" + breed + ">" + breed + " </option>";
+       text += "<option onclick= \"subbreedPicker('" + breed + "')\"   value=" + breed + ">" + breed + " </option>";
    }
     text += "<option onclick= 'breed = \"\"; document.getElementById(\"subbreeds\").innerHTML = \"\";' value=\"\" selected> none </option>";
     document.getElementById("dogSelect").innerHTML = text;
 }
+//gets a random dog. either by specific or not.
 function getRndDog() {
     let target;
     if( breed !== "") {
@@ -55,10 +54,8 @@ function getRndDog() {
     }
     else target = "https://dog.ceo/api/breeds/image/random";
     Quester.get(target, () => {
-        let data = JSON.parse(Quester._requestObject.response);
-        let link = data[Object.keys(data)[0]];
-        let imgSource= "<img srcset='" + link +  " 500w, "+ link +" 800w, "+ link +"' sizes='(max-width:500px, max-height:500px)80vw,(max-width:350px, max-height:500px)10vw,1000px' src= " + link + " class='mx-auto rounded img-thumbnail img-fluid' alt='...' >";
-        document.getElementById("dogframe").innerHTML = imgSource
+       let link = JSON.parse(Quester._requestObject.response).message;
+       let imgSource= "<img srcset='" + link +  " 500w, "+ link +" 800w, "+ link +"' sizes='(max-width:500px, max-height:500px)80vw,(max-width:350px, max-height:500px)10vw,1000px' src= " + link + " class='mx-auto rounded img-thumbnail img-fluid' alt='...' >";
+       document.getElementById("dogframe").innerHTML = imgSource;
     });
 }
-
